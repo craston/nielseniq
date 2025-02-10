@@ -1,7 +1,16 @@
+import logging
+from abc import ABC, abstractmethod
+from pathlib import Path
+
 import pandas as pd
 import torch
-from part_two.data_handling.off import DatasetColumns
-from abc import ABC, abstractmethod
+import typer
+from data_handling.off import DatasetColumns
+from utils import set_global_seed
+
+logging.basicConfig(level=logging.INFO)
+
+app = typer.Typer()
 
 
 class Splitter(ABC):
@@ -90,9 +99,38 @@ class AttributeSplitter(Splitter):
         """
         cols = [col.value for col in self.col_names]
 
-        # check if the columns are present in the DataFrame
         assert all(col in self.df.columns for col in cols), (
-            "Column not found in DataFrame."
+            "One or more columns not found in the DataFrame."
         )
-
         return self.df[cols]
+
+
+@app.command()
+def run(
+    input_csv: Path = typer.Option(..., exists=True, file_okay=True),
+    fractions: list[float] = typer.Option(
+        [0.8, 0.2], help="Fractions for train-test split."
+    ),
+    columns: list[DatasetColumns] = typer.Option(
+        [
+            DatasetColumns.IMAGE_URL.value,
+            DatasetColumns.NUTRISCORE_GRADE.value,
+        ],
+        help="Columns to select from the DataFrame.",
+    ),
+):
+    """
+    Split the input CSV file into train and test sets based on the specified fractions.
+    """
+    df = pd.read_csv(input_csv)
+
+    set_global_seed(42)
+    # Ensure that torch is globally seeded before calling this function
+    df = AttributeSplitter(df, columns).split()
+    split_dfs = RowSplitter(df, fractions).split()
+
+    logging.info(f"Train set size: {len(split_dfs[0])}")
+    logging.info(f"Test set size: {len(split_dfs[1])}")
+
+    logging.info(f"Train set: {split_dfs[0].head()}")
+    logging.info(f"Test set: {split_dfs[1].head()}")
