@@ -1,0 +1,31 @@
+seed: 42
+
+# Splitter configuration
+splitter:
+  attribute_splitter:
+    enabled: true  # Enable or disable AttributeSplitter
+    columns: ["IMAGE_URL", "NUTRISCORE_GRADE"]  # Enum names from DatasetColumns
+
+  row_splitter:
+    enabled: true  # Enable or disable RowSplitter
+    fractions: [0.7, 0.3]  # Splitting ratio (must sum to 1) strictly two splits
+
+image_folder: "images"  # Folder where images are stored/downloaded
+
+batch_size: 32
+learning_rate: 0.001
+epochs: 10
+device: "cuda"  # Use "cuda" for GPU, "cpu" for CPU
+task: "classification"  # Options: classification, multiclass, ner
+
+# Model configuration
+model: "CustomModel"  # Replace with the actual model class
+
+# Paths
+csv_file: "data/dataset.csv"
+image_folder: "data/images"
+checkpoint_path: "checkpoints/"
+
+# Data split configuration
+train_split: 0.8  # 80% training, 20% test
+
