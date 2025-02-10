@@ -1,6 +1,6 @@
 import pandas as pd
-from part_two.data_handling.off import DatasetColumns
-from part_two.data_handling.splitters import AttributeSplitter, RowSplitter
+from data_handling.off import DatasetColumns
+from data_handling.splitters import AttributeSplitter, RowSplitter
 
 
 def split_dataset(df: pd.DataFrame, config: dict) -> pd.DataFrame:

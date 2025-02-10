@@ -7,6 +7,7 @@ import torch
 from torch.utils.data import Dataset
 from torchvision.transforms.v2 import Transform
 from PIL import Image
+from tqdm import tqdm
 import wget
 import pandas as pd
 import pytesseract
@@ -65,7 +66,8 @@ class OFFDataset(Dataset):
 
         self.image_folder.mkdir(parents=True, exist_ok=True)
 
-        for url in self.df[DatasetColumns.IMAGE_URL.value]:
+        logging.info(f"Checking for missing images in {self.image_folder}...")
+        for url in tqdm(self.df[DatasetColumns.IMAGE_URL.value]):
             image_name = self._get_image_name(url)
             if not (self.image_folder / image_name).exists():
                 self._download_image(url, self.image_folder / image_name)
