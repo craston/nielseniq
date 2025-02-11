@@ -1,17 +1,17 @@
-from pathlib import Path
-import shutil
 import logging
-from typing import Optional, List, Union
+import shutil
+from enum import Enum
+from pathlib import Path
+from typing import List, Optional
 
-import torch
-from torch.utils.data import Dataset
-from torchvision.transforms.v2 import Transform
-from PIL import Image
-from tqdm import tqdm
-import wget
 import pandas as pd
 import pytesseract
-from enum import Enum
+import torch
+import wget
+from PIL import Image
+from torch.utils.data import Dataset
+from torchvision.transforms.v2 import Transform
+from tqdm import tqdm
 
 logger = logging.getLogger(__name__)
 
@@ -103,11 +103,18 @@ class OFFDataset(Dataset):
         return {label: idx for idx, label in enumerate(sorted(unique_labels))}
 
     def __len__(self):
+        """
+        Returns the length of the dataset.
+        """
         return len(self.df)
 
     def _load_image(self, idx: int) -> Optional[Image.Image]:
         """
         Loads and returns an image given the index.
+        Args:
+            idx (int): Index of the image to load.
+        Returns:
+            Image.Image: Loaded image.
         """
         image_name = self._get_image_name(
             self.df.iloc[idx][DatasetColumns.IMAGE_URL.value]
@@ -147,7 +154,14 @@ class OFFSingleClass(OFFDataset):
             force_download,
         )
 
-    def __getitem__(self, idx: int):
+    def __getitem__(self, idx: int) -> dict:
+        """
+        Returns a single sample from the dataset.
+        Args:
+            idx (int): Index of the sample to return.
+        Returns:
+            dict: A dictionary containing the image and label.
+        """
         image = self._load_image(idx)
         if image is None:
             return None
@@ -180,6 +194,13 @@ class OFFMultiClass(OFFDataset):
         )
 
     def __getitem__(self, idx: int) -> dict:
+        """
+        Returns a single sample from the dataset.
+        Args:
+            idx (int): Index of the sample to return.
+        Returns:
+            dict: A dictionary containing the image and label.
+        """
         image = self._load_image(idx)
         if image is None:
             return None
@@ -219,6 +240,13 @@ class OFFEntityExtraction(OFFDataset):
         raise NotImplementedError("Subclasses must implement embed_text.")
 
     def __getitem__(self, idx: int) -> dict:
+        """
+        Returns a single sample from the dataset.
+        Args:
+            idx (int): Index of the sample to return.
+        Returns:
+            dict: A dictionary containing the image, text, and label.
+        """
         image = self._load_image(idx)
         if image is None:
             return None

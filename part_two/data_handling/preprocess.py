@@ -6,6 +6,9 @@ from data_handling.splitters import AttributeSplitter, RowSplitter
 def split_dataset(df: pd.DataFrame, config: dict) -> pd.DataFrame:
     """
     Split the dataset into train and test sets based on the configuration.
+    Args:
+        df (pd.DataFrame): The dataset to split.
+        config (dict): The configuration dictionary (see config.yaml).
     """
     # Step 1: Apply AttributeSplitter (if enabled)
     if config["splitter"]["attribute_splitter"]["enabled"]:

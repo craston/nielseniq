@@ -1,21 +1,20 @@
-from enum import Enum
 import logging
+from enum import Enum
 from pathlib import Path
 
 import pandas as pd
 import torch
 import typer
 import yaml
-from torch.utils.data import DataLoader
-from torchvision import transforms
-from train import TrainerClassifier, TrainerNER
-
 from data_handling.off import (
     OFFEntityExtraction,
     OFFMultiClass,
     OFFSingleClass,
 )
 from data_handling.preprocess import split_dataset
+from torch.utils.data import DataLoader
+from torchvision import transforms
+from train import TrainerClassifier, TrainerNER
 from utils import set_global_seed
 
 app = typer.Typer()

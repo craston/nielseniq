@@ -1,11 +1,11 @@
+import logging
 from pathlib import Path
 from typing import Callable
-import torch.nn as nn
+
 import torch
+import torch.nn as nn
 from torch.optim import Optimizer
 from torch.utils.data import DataLoader
-
-import logging
 
 logging.basicConfig(level=logging.INFO)
 
@@ -20,6 +20,15 @@ class TrainerBase:
         checkpoint_path: Path = None,
         resume: bool = False,
     ):
+        """ "
+        Args:
+            model (nn.Module): The model to train.
+            criterion (Callable): The loss function to use.
+            optimizer (Optimizer): The optimizer to use.
+            device (str): The device to train on (e.g. "cuda" or "cpu").
+            checkpoint_path (Path): The path to save/load checkpoints.
+            resume (bool): Whether to resume training from the checkpoint.
+        """
         self.model = model.to(device)
         self.criterion = criterion
         self.optimizer = optimizer
@@ -31,6 +40,9 @@ class TrainerBase:
             self._load_checkpoint()
 
     def _load_checkpoint(self):
+        """
+        Load the latest checkpoint from the checkpoint path.
+        """
         if self.checkpoint_path and self.checkpoint_path.exists():
             checkpoint = torch.load(self.checkpoint_path)
             self.model.load_state_dict(checkpoint["state_dict"])
@@ -43,6 +55,9 @@ class TrainerBase:
             print("No checkpoint found. Training from scratch.")
 
     def _save_checkpoint(self, epoch):
+        """
+        Save a checkpoint at the given epoch.
+        """
         if self.checkpoint_path:
             state = {
                 "epoch": epoch + 1,
@@ -54,6 +69,12 @@ class TrainerBase:
             print(f"Checkpoint saved: {checkpoint_file}")
 
     def train(self, train_loader: DataLoader, num_epochs: int):
+        """
+        Train the model for the given number of epochs.
+        Args:
+            train_loader (DataLoader): The DataLoader for the training dataset.
+            num_epochs (int): The number of epochs to train for
+        """
         self.model.train()
         for epoch in range(self.epoch, num_epochs):
             running_loss = 0.0
@@ -78,7 +99,14 @@ class TrainerBase:
 
             self._save_checkpoint(epoch)
 
-    def test(self, test_loader: DataLoader):
+    def test(self, test_loader: DataLoader) -> float:
+        """
+        Test the model on the test dataset.
+        Args:
+            test_loader (DataLoader): The DataLoader for the test dataset.
+        Returns:
+            float: The test accuracy.
+        """
         self.model.eval()
         correct = 0
         total = 0
@@ -108,6 +136,12 @@ class TrainerClassifier(TrainerBase):
 
 class TrainerNER(TrainerBase):
     def train(self, train_loader: DataLoader, num_epochs: int):
+        """
+        Train the model for the given number of epochs.
+        Args:
+            train_loader (DataLoader): The DataLoader for the training dataset.
+            num_epochs (int): The number of epochs to train for
+        """
         self.model.train()
         for epoch in range(self.epoch, num_epochs):
             running_loss = 0.0
@@ -133,7 +167,14 @@ class TrainerNER(TrainerBase):
 
             self._save_checkpoint(epoch)
 
-    def test(self, test_loader: DataLoader):
+    def test(self, test_loader: DataLoader) -> float:
+        """
+        Test the model on the test dataset.
+        Args:
+            test_loader (DataLoader): The DataLoader for the test dataset.
+        Returns:
+            float: The test accuracy.
+        """
         self.model.eval()
         correct = 0
         total = 0
